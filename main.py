@@ -11,16 +11,17 @@ import random
 RANDOM = 0
 SEQUENCE = 1
 LOOP = 2  # 随机，列表，循环三种播放模式
-mod_dict = {'random':RANDOM, 'sequence':SEQUENCE, 'loop':LOOP}
-MUSIC_END = pygame.USEREVENT + 1
+mod_dict = {'random': RANDOM, 'sequence': SEQUENCE, 'loop': LOOP}
+cmd_list = {'exit', 'play', 'add', 'next', 'ls', 'pause', 'unpause', 'help', 'clear', 'chmod'}
 
 audio_path = "E:/bilibiliPlayer/audio/"
 src_path = "E:/bilibiliPlayer/src_list/"
 play_mode = RANDOM  # 默认随机播放
 song_list = []  # 待播放歌曲列表
 song_num = 0  # 歌曲数量
-cur_song  = -1  # 正在播放的歌曲， 防止随机播放播放出同一首哥
+cur_song = -1  # 正在播放的歌曲， 防止随机播放播放出同一首哥
 start_flag = False
+close_flag = False  # 关闭标识，用于结束监听线程
 
 
 def print_help():
@@ -66,8 +67,10 @@ def add_song(cmd):
     os.system("you-get https://www.bilibili.com/video/" + song + " -O E:/bilibiliPlayer/audio/temp")
     os.system("ffmpeg -i E:/bilibiliPlayer/audio/temp.mp4 -vn E:/bilibiliPlayer/audio/" + name + ".mp3")
     os.system("del/f/s/q E:\\bilibiliPlayer\\audio\\temp.mp4")  # 下载视频， 转换成音频文件，删除temp文件
-
-    update_list()   # 更新歌曲列表
+    print(audio_path + "*.xml")
+    # os.system("del/f/s/q " + audio_path + "/*.xml")     # 删除弹幕文件
+    os.system("del/f/s/q *.xml")    # 删除弹幕文件，由于当前目录在audio_path下，所以直接删除当前目录的xml文件就行
+    update_list()  # 更新歌曲列表
 
 
 def check_song_not_exist(song):
@@ -80,10 +83,20 @@ def check_song_not_exist(song):
 def play_song(cmd):
     global cur_song
     if len(cmd) == 1:
-        cur_song = "test3.mp3"
-        pygame.mixer.music.load(audio_path + "test.mp3")
+        cur_song = song_list[0] # 默认播放第一首歌曲
+        pygame.mixer.music.load(audio_path + song_list[0])
         pygame.mixer.music.play()
     else:
+        try:
+            x = int(cmd[1])
+            if x < 0 or x >= song_num:
+                print("Out of bounds of song_list\n")
+                return
+            pygame.mixer.music.load(audio_path + song_list[x])
+            pygame.mixer.music.play()
+            return
+        except ValueError:
+            pass
         if check_song_not_exist(cmd[1]):
             print("歌曲" + cmd[1] + "不存在\n")
             return
@@ -93,23 +106,48 @@ def play_song(cmd):
 
 
 def not_cmd(cmd):
-    if cmd != "ls" and cmd != "add" and cmd != "exit" and cmd != "help" and cmd != "play":
-        return True
-    return False
+    if cmd in cmd_list:
+        return False
+    return True
+
+
+def get_another_song():
+    while True:
+        x = random.randint(0, song_num - 1)
+        if song_list[x] != cur_song:
+            break
+    return x
 
 
 def listener():
     temp_cmd = ['play']
     while True:
-        if pygame.mixer.music.get_busy() or start_flag is False:
+        if (pygame.mixer.music.get_busy() or start_flag is False) and not close_flag:  # 还未开始或正在播放
             time.sleep(0.1)
         else:
-            while True:
-                x = random.randint(0, song_num - 1)
-                if song_list[x] != cur_song:
-                    break
-            temp_cmd.append(song_list[x])
-            play_song(temp_cmd)
+            if close_flag:  # 判断程序是否结束
+                break
+            next_song()
+            # x = get_another_song()
+            # temp_cmd.append(song_list[x])
+            # play_song(temp_cmd)
+
+
+def next_song():
+    temp_cmd = ['play']
+    if play_mode == LOOP:
+        print("You are in loop mode, next song will still be the same")
+        temp_cmd.append(cur_song)
+        play_song(temp_cmd)
+    elif play_mode == RANDOM:
+        x = get_another_song()
+        temp_cmd.append(song_list[x])
+        play_song(temp_cmd)
+    elif play_mode == SEQUENCE:
+        x = song_list.index(cur_song)  # 获取当前正在播放的歌曲序号
+        x = x + 1  # 切换到下一首
+        temp_cmd.append(song_list[x])
+        play_song(temp_cmd)
 
 
 def update_list():
@@ -145,13 +183,17 @@ if __name__ == "__main__":
 
     listener_thread = threading.Thread(target=listener, args=())
     listener_thread.start()
+    os.chdir(audio_path)
+    # print("current working directory is " + os.getcwd() + "\n")
 
     while True:
         raw_cmd = input("")
         raw_cmd = raw_cmd.strip()
         cmd = raw_cmd.split(" ")
 
+        # 待解决：如何解决多个if的问题，是否能用类似switch的方式解决
         if cmd[0] == "exit":
+            close_flag = True
             break
 
         if cmd[0] == "add":
@@ -168,9 +210,12 @@ if __name__ == "__main__":
             start_flag = True
             play_song(cmd)
 
+        if cmd[0] == "next":
+            next_song()
+
         if cmd[0] == "ls":
             for song in song_list:
-                print(song)
+                print(str(song_list.index(song)) + ": " + song)
 
         if cmd[0] == "pause":
             pygame.mixer.music.pause()
@@ -178,11 +223,15 @@ if __name__ == "__main__":
         if cmd[0] == "unpause":
             pygame.mixer.music.unpause()
 
-        if cmd[0] == "chmod":   # 更改播放模式
+        if cmd[0] == "clear":
+            os.system("cls")
+
+        if cmd[0] == "chmod":  # 更改播放模式
             change_mod(cmd)
 
-        # if not_cmd(cmd[0]):
-        #     print("Exec " + cmd[0] + " Failed.Please check your command.")
+        if not_cmd(cmd[0]):
+            print("Exec " + cmd[0] + " Failed.Please check your command.")
 
     print("Bye\n")
+    pygame.mixer.quit()
     pygame.quit()
