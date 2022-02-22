@@ -5,6 +5,8 @@ bilibili音频播放器
 
 提供一个CLI的播放器
 
+python main.py即可
+
 基本命令：
 
 add BVxxx yyy // 下载BV号为xxx的视频，存储为yyy.mp3
