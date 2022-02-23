@@ -40,7 +40,7 @@ def print_list():
 def merge_name(cmd):
     ret = ""
     for i in range(0, len(cmd) - 1):
-        ret += cmd[i] + "_"
+        ret += cmd[i] + " "
     ret += cmd[len(cmd) - 1]
     return ret
 
@@ -76,10 +76,9 @@ def add_song(cmd):
         print("名称已存在，请重命名")
         return
 
-    os.system("you-get https://www.bilibili.com/video/" + song + " -O E:/bilibiliPlayer/audio/temp")
-    os.system("ffmpeg -i E:/bilibiliPlayer/audio/temp.mp4 -vn E:/bilibiliPlayer/audio/" + name + ".mp3")
-    os.system("del/f/s/q E:\\bilibiliPlayer\\audio\\temp.mp4")  # 下载视频， 转换成音频文件，删除temp文件
-    # os.system("del/f/s/q " + audio_path + "/*.xml")     # 删除弹幕文件
+    os.system("you-get https://www.bilibili.com/video/" + song + " -O \"" + audio_path + "temp\"")
+    os.system("ffmpeg -i E:/bilibiliPlayer/audio/temp.mp4 -vn \"" + audio_path + name + ".mp3\"")
+    os.system("del/f/s/q temp.mp4")  # 下载视频， 转换成音频文件，删除temp文件
     os.system("del/f/s/q *.xml")  # 删除弹幕文件，由于当前目录在audio_path下，所以直接删除当前目录的xml文件就行
     update_list()  # 更新歌曲列表
 
