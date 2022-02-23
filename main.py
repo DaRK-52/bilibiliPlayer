@@ -13,11 +13,10 @@ from window import *
 
 if __name__ == "__main__":
     print("Welcome to use bilibiliPlayer")
+    os.chdir(audio_path)  # 切换到保存音频的目录下
     init()  # 初始化设置
     listener_thread = threading.Thread(target=listener, args=())
     listener_thread.start()  # 开启监听线程
-
-    os.chdir(audio_path)  # 切换到保存音频的目录下
 
     while True:
         raw_cmd = input("$ ")
@@ -27,7 +26,7 @@ if __name__ == "__main__":
         # 待解决：如何解决多个if的问题，是否能用类似switch的方式解决
         # 能否直接通过搜索关键词找到BV号
         # 下载封面功能
-        # 增加分组功能，类似于分歌单
+        # 增加分组功能，类似于分歌单，暂时先拿文件存歌单，之后再考虑数据库连接
         # GUI
         # 急需重写随机功能，random模式每次顺序都一样
         if cmd[0] == "exit":
@@ -72,6 +71,15 @@ if __name__ == "__main__":
 
         if cmd[0] == "export":
             export_path(cmd)    # 修改audio_path
+
+        if cmd[0] == "create":
+            create(cmd)
+
+        if cmd[0] == "update":
+            update(cmd)
+
+        if cmd[0] == "use":  # 选择歌单
+            use_song_table(cmd)
 
         if not_cmd(cmd[0]):
             print("Exec " + cmd[0] + " Failed.Please check your command.")

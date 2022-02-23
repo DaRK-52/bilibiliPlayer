@@ -5,17 +5,25 @@ import requests
 import win32con
 import win32api
 import threading
+import pickle
+import joblib
 import pygame
 import random
+from str2byte import *
 
 RANDOM = 0
 SEQUENCE = 1
 LOOP = 2  # 随机，列表，循环三种播放模式
 mod_dict = {'random': RANDOM, 'sequence': SEQUENCE, 'loop': LOOP}
-cmd_list = {'exit', 'play', 'add', 'next', 'ls', 'pause', 'unpause', 'help', 'chmod', 'ps', 'search', 'export'}
+cmd_list = {'exit', 'play', 'add', 'next', 'ls', 'pause', 'unpause', 'help', 'chmod', 'ps', 'search', 'export',
+            'create', 'update', 'use'}
 
-audio_path = "E:/bilibiliPlayer/audio/"     # 建议修改为自己的路径，也可以使用export命令修改
+audio_path = "E:/bilibiliPlayer/audio/"  # 建议修改为自己的路径，也可以使用export命令修改
 src_path = "E:/bilibiliPlayer/src_list/"
+
+song_table = {}  # 存放歌单相关信息，会把它序列化
+song_table_list = {}  # 存放每个歌单中的歌曲
+
 play_mode = RANDOM  # 默认随机播放
 song_list = []  # 待播放歌曲列表
 song_num = 0  # 歌曲数量
@@ -28,7 +36,7 @@ def print_help():
     f = open(src_path + "readme.txt", encoding="utf-8")
     text = f.readlines()
     for line in text:
-        print(line, end='') # 自带换行符，最后不换行
+        print(line, end='')  # 自带换行符，最后不换行
     f.close()
 
 
@@ -108,7 +116,7 @@ def play_song(cmd):
             x = int(cmd[1])
             if x < 0 or x >= song_num:
                 print("Out of bounds of song_list\n")
-                return 1    # 1代表错误， 0代表无错误
+                return 1  # 1代表错误， 0代表无错误
             pygame_play_song(audio_path, song_list[x])
             return 0
         except ValueError:
@@ -154,7 +162,7 @@ def listener():  # 监听歌曲是否结束，如果结束就切下一首歌
 def next_song():
     temp_cmd = ['play']
     if play_mode == LOOP:
-        print("You are in loop mode, next song will still be the same")
+        # print("You are in loop mode, next song will still be the same")
         temp_cmd.append(cur_song)
         play_song(temp_cmd)
     elif play_mode == RANDOM:
@@ -177,11 +185,16 @@ def update_list():
 
 #   初始化设置
 def init():
-    global play_mode
+    global play_mode, song_table
     play_mode = RANDOM  # 默认播放方式为随机
     random.seed(time.time())
     update_list()  # 更新曲目
     pygame.mixer.init()
+
+    f = open(src_path + 'list.txt', 'r')
+    if os.path.getsize(src_path + 'list.txt') > 0:
+        song_table = pickle.load(StrToBytes(f))
+    f.close()
 
 
 def change_mod(cmd):
@@ -215,7 +228,7 @@ def get_search_text(cmd):
             text = text + next(cmd_iterator) + "%20"
         except StopIteration:
             break
-    text = text[0:-3]   # 去除最后一个%20
+    text = text[0:-3]  # 去除最后一个%20
     return text
 
 
@@ -227,7 +240,7 @@ def search(cmd):
     search_text = get_search_text(cmd)
 
     r = requests.get("https://search.bilibili.com/all?keyword=" + search_text)
-    result = re.findall(r'<a title=.*href="//www.bilibili.com/video/BV[A-Za-z0-9]+', r.text)    # 奇妙的正则匹配
+    result = re.findall(r'<a title=.*href="//www.bilibili.com/video/BV[A-Za-z0-9]+', r.text)  # 奇妙的正则匹配
 
     title_list = []
     BV_list = []
@@ -263,3 +276,66 @@ def export_path(cmd):
         print("需要更多参数")
         return
     audio_path = cmd[1]
+
+
+def create(cmd):
+    if len(cmd) < 3:
+        print("需要更多参数")
+        return
+
+    if cmd[1] == 'table':
+        list_name = merge_name(cmd[2:])
+        if list_name in song_table.keys():
+            print("歌单名重复，请重新考虑歌单名")
+            return
+        song_table[list_name] = []  # 创建一个空歌单
+        f = open(src_path + "list.txt", "wb")
+        pickle.dump(song_table, StrToBytes(f), 1)  # 二进制存储
+        f.close()
+
+
+def update(cmd):
+    global song_table
+    if len(cmd) < 4:
+        print("需要更多参数")
+        return
+
+    if cmd[1] not in song_table.keys():
+        print("不存在这个歌单")
+        return
+
+    if cmd[2] not in ('add', 'drop'):
+        print("不存在指令" + cmd[2])
+        return
+
+    if cmd[3] not in song_list:
+        print("不存在歌曲" + cmd[3])
+
+    key = cmd[1]
+    command = cmd[2]
+    value = cmd[3]
+
+    # print(type(song_table[key]))
+    if command == 'add':
+        song_table[key].append(value)
+
+    f = open(src_path + "list.txt", "wb")
+    pickle.dump(song_table, StrToBytes(f), 1)
+    f.close()
+
+
+def use_song_table(cmd):
+    global song_list
+    global song_num
+    if len(cmd) < 2:
+        print("需要更多参数")
+        return
+
+    if cmd[1] not in song_table.keys():
+        print("不存在歌单" + cmd[1])
+        return
+
+    song_list = []
+    for value in song_table[cmd[1]]:
+        song_list.append(value)
+    song_num = len(song_list)
