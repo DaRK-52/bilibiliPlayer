@@ -23,7 +23,7 @@ src_path = "E:/bilibiliPlayer/src_list/"
 
 # 其中的local歌单是当前目录下的所有歌曲
 song_table = {}  # 存放歌单相关信息，会把它序列化
-cur_song_table = '' # 记录当前播放的歌单名
+cur_song_table = ''  # 记录当前播放的歌单名
 # song_table_list = {}  # 存放每个歌单中的歌曲
 
 play_mode = RANDOM  # 默认随机播放
@@ -42,13 +42,13 @@ def print_help():
     f.close()
 
 
-def print_list(cmd):    # 支持查看歌单里面的内容
+def print_list(cmd):  # 支持查看歌单里面的内容
     global song_list, song_table
     if len(cmd) == 1:
         for song in song_list:
             print(str(song_list.index(song)) + ": " + song)
     else:
-        cmd_song_table = cmd[1] # 想来想去觉得还是不要有空格比较好
+        cmd_song_table = cmd[1]  # 想来想去觉得还是不要有空格比较好
         if cmd_song_table in song_table.keys():
             for song in song_table[cmd_song_table]:
                 print(str(song_table[cmd_song_table].index(song)) + ": " + song)
@@ -66,7 +66,8 @@ def merge_name(cmd):
 
 #   检查下载的时候BV号是否存在
 def check_BV_not_exist(song):
-    res = requests.get("https://www.bilibili.com/video/" + song)
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64)", "Connection": "close"}
+    res = requests.get("https://www.bilibili.com/video/" + song, headers=headers)
     if ("very_sorry.png" in res.text):  # 判断BV号是否存在，利用页面上是否有very_sorry.png判断
         return True
     return False
@@ -80,6 +81,7 @@ def check_name_not_exist(name):  # 检查歌曲名是否已经存在
 
 
 def add_song(cmd):
+    global cur_song_table
     song = cmd[1]  # 获取歌曲对应BV号
 
     if check_BV_not_exist(song):
@@ -100,6 +102,7 @@ def add_song(cmd):
     os.system("del/f/s/q temp.mp4")  # 下载视频， 转换成音频文件，删除temp文件
     os.system("del/f/s/q *.xml")  # 删除弹幕文件，由于当前目录在audio_path下，所以直接删除当前目录的xml文件就行
     update_list()  # 更新歌曲列表
+    use_song_table(['use', cur_song_table])  # 使用更新过的列表
 
 
 def check_song_not_exist(song):
@@ -188,6 +191,9 @@ def next_song():
 
 
 def update_local_list():
+    global song_list
+    global song_num
+    global cur_song_table
     song_table['local'] = []
     for i in os.listdir(audio_path):
         song_table['local'].append(i)
@@ -197,6 +203,7 @@ def update_local_list():
 def update_list():  # 需要重新修改
     global song_list
     global song_num
+    global cur_song_table
     # song_list = os.listdir(audio_path)  # 刷新获取当前目录下的歌曲
     # song_num = len(song_list)
     # song_table['local'] = []
@@ -270,42 +277,76 @@ def get_search_text(cmd):
     return text
 
 
+# state用于区分BV号和av号
+def re_match(result, flag):
+    title_list = []
+    list1 = []  # list for BV or av
+    for i, info in enumerate(result):
+        tmp = info.split("\"")
+        title_list.append(tmp[1])  # 纯纯的正则表达式匹配，匹配下来的第一个项是title所以它一定会夹在第一个"和第二个"间
+        if flag == 0:
+            list1.append(re.findall(r'BV[a-zA-Z0-9]+', info)[0])  # 将BV号加入列表
+            print(str(i) + " title:" + tmp[1] + " " + re.findall(r'BV[a-zA-Z0-9]+', info)[0])
+        elif flag == 1:
+            list1.append(re.findall(r'av[a-zA-Z0-9]+', info)[0])  # 将BV号加入列表
+            print(str(i) + " title:" + tmp[1] + " " + re.findall(r'av[a-zA-Z0-9]+', info)[0])
+    return list1
+
 # search需要重新修改以支持av号搜索
 def search(cmd):
+    mode = 0    # 代表默认使用BV号模式，为1时表示使用av号下载
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64)", "Connection": "close"}
     if len(cmd) == 1:
         print("请输入您想要搜索的内容\n")
         return
 
     search_text = get_search_text(cmd)
 
-    r = requests.get("https://search.bilibili.com/all?keyword=" + search_text)
+    r = requests.get("https://search.bilibili.com/all?keyword=" + search_text, headers=headers)
     result = re.findall(r'<a title=.*href="//www.bilibili.com/video/BV[A-Za-z0-9]+', r.text)  # 奇妙的正则匹配
 
     title_list = []
-    BV_list = []
-    for i, info in enumerate(result):
-        tmp = info.split("\"")
-        title_list.append(tmp[1])  # 纯纯的正则表达式匹配，匹配下来的第一个项是title所以它一定会夹在第一个"和第二个"间
-        BV_list.append(re.findall(r'BV[a-zA-Z0-9]+', info)[0])  # 将BV号加入列表
-        print(str(i) + " title:" + tmp[1] + " " + re.findall(r'BV[a-zA-Z0-9]+', info)[0])
-    print('请选择您想下载的音乐（输入序号与歌曲名即可（无歌曲名默认为BV号）,若无输入back即可）')
+    av_list = []
+
+    # for i, info in enumerate(result):
+    #     tmp = info.split("\"")
+    #     title_list.append(tmp[1])  # 纯纯的正则表达式匹配，匹配下来的第一个项是title所以它一定会夹在第一个"和第二个"间
+    #     BV_list.append(re.findall(r'BV[a-zA-Z0-9]+', info)[0])  # 将BV号加入列表
+    #     print(str(i) + " title:" + tmp[1] + " " + re.findall(r'BV[a-zA-Z0-9]+', info)[0])
+
+    BV_list = re_match(result, 0)
+    length_of_list = len(BV_list)
+    if len(BV_list) == 0:
+        result = re.findall(r'<a title=.*href="//www.bilibili.com/video/av[A-Za-z0-9]+', r.text)  # 奇妙的正则匹配
+        av_list = re_match(result, 1)
+        mode = 1
+        length_of_list = len(av_list)
+
+    print('请选择您想下载的音乐（输入序号与歌曲名即可（无歌曲名默认为BV或av号）,若无输入back即可）')
 
     select_cmd = input()
     select_cmd = select_cmd.split(' ')
     if select_cmd[0] == 'back':
         return
     try:
-        if int(select_cmd[0]) > len(title_list):  # 这里理论上需要一个catch
+        if int(select_cmd[0]) > length_of_list:  # 这里理论上需要一个catch
             print('没有那么多歌曲')
             return
     except ValueError:
         print("请输入序号")
         return
 
-    if len(select_cmd) == 1:
-        temp_cmd = ['add', BV_list[int(select_cmd[0])], BV_list[int(select_cmd[0])]]
-    else:
-        temp_cmd = ['add', BV_list[int(select_cmd[0])], merge_name(select_cmd[1:])]
+    if mode == 0:   # BV mode
+        if len(select_cmd) == 1:
+            temp_cmd = ['add', BV_list[int(select_cmd[0])], BV_list[int(select_cmd[0])]]
+        else:
+            temp_cmd = ['add', BV_list[int(select_cmd[0])], merge_name(select_cmd[1:])]
+    elif mode == 1:
+        if len(select_cmd) == 1:
+            temp_cmd = ['add', av_list[int(select_cmd[0])], av_list[int(select_cmd[0])]]
+        else:
+            temp_cmd = ['add', av_list[int(select_cmd[0])], merge_name(select_cmd[1:])]
+
     add_song(temp_cmd)
 
 
@@ -322,7 +363,7 @@ def create(cmd):
         print("需要更多参数")
         return
 
-    if cmd[1] == 'table':   # 这里其实是想保留创建更多其他结构的可能，但可能没有了
+    if cmd[1] == 'table':  # 这里其实是想保留创建更多其他结构的可能，但可能没有了
         list_name = merge_name(cmd[2:])
         if list_name in song_table.keys():
             print("歌单名重复，请重新考虑歌单名")
@@ -360,7 +401,7 @@ def update(cmd):
             if 0 <= x < len(song_table['local']):
                 value = song_table['local'][x]
             else:
-                value = int('asdasdasd')    # 强行触发ValueError
+                value = int('asdasdasd')  # 强行触发ValueError
                 print(value)
         except ValueError:
             print("不存在歌曲" + cmd[3])
@@ -376,7 +417,7 @@ def update(cmd):
         song_table[key].append(value)
 
     update_song_table()
-    use_song_table(['use', cur_song_table]) # 更新当前歌单，防止ls出问题
+    use_song_table(['use', cur_song_table])  # 更新当前歌单，防止ls出问题
     # f = open(src_path + "list.txt", "wb")
     # pickle.dump(song_table, StrToBytes(f), 1)
     # f.close()
