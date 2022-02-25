@@ -24,11 +24,11 @@ if __name__ == "__main__":
         cmd = raw_cmd.split(" ")
 
         # 待解决：如何解决多个if的问题，是否能用类似switch的方式解决
-        # 能否直接通过搜索关键词找到BV号
+        # 能否直接通过搜索关键词找到BV号  # BV号已完成，但它改成av号了我真吐了
         # 下载封面功能
-        # 增加分组功能，类似于分歌单，暂时先拿文件存歌单，之后再考虑数据库连接
+        # 增加分组功能，类似于分歌单，暂时先拿文件存歌单，之后再考虑数据库连接   # 序列化版本已完成
         # GUI
-        # 急需重写随机功能，random模式每次顺序都一样
+        # 急需重写随机功能，random模式每次顺序都一样 # 已解决
         if cmd[0] == "exit":
             function.close_flag = True  # 设置close_flag为true，使监听线程退出
             break
@@ -52,7 +52,7 @@ if __name__ == "__main__":
             next_song()
 
         if cmd[0] == "ls":
-            print_list()
+            print_list(cmd)
 
         if cmd[0] == "pause":
             pygame.mixer.music.pause()
@@ -80,6 +80,9 @@ if __name__ == "__main__":
 
         if cmd[0] == "use":  # 选择歌单
             use_song_table(cmd)
+
+        if cmd[0] == "desc":    # 显示歌单信息
+            desc(cmd)
 
         if not_cmd(cmd[0]):
             print("Exec " + cmd[0] + " Failed.Please check your command.")

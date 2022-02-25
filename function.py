@@ -16,13 +16,15 @@ SEQUENCE = 1
 LOOP = 2  # 随机，列表，循环三种播放模式
 mod_dict = {'random': RANDOM, 'sequence': SEQUENCE, 'loop': LOOP}
 cmd_list = {'exit', 'play', 'add', 'next', 'ls', 'pause', 'unpause', 'help', 'chmod', 'ps', 'search', 'export',
-            'create', 'update', 'use'}
+            'create', 'update', 'use', 'desc'}
 
 audio_path = "E:/bilibiliPlayer/audio/"  # 建议修改为自己的路径，也可以使用export命令修改
 src_path = "E:/bilibiliPlayer/src_list/"
 
+# 其中的local歌单是当前目录下的所有歌曲
 song_table = {}  # 存放歌单相关信息，会把它序列化
-song_table_list = {}  # 存放每个歌单中的歌曲
+cur_song_table = '' # 记录当前播放的歌单名
+# song_table_list = {}  # 存放每个歌单中的歌曲
 
 play_mode = RANDOM  # 默认随机播放
 song_list = []  # 待播放歌曲列表
@@ -40,9 +42,18 @@ def print_help():
     f.close()
 
 
-def print_list():
-    for song in song_list:
-        print(str(song_list.index(song)) + ": " + song)
+def print_list(cmd):    # 支持查看歌单里面的内容
+    global song_list, song_table
+    if len(cmd) == 1:
+        for song in song_list:
+            print(str(song_list.index(song)) + ": " + song)
+    else:
+        cmd_song_table = cmd[1] # 想来想去觉得还是不要有空格比较好
+        if cmd_song_table in song_table.keys():
+            for song in song_table[cmd_song_table]:
+                print(str(song_table[cmd_song_table].index(song)) + ": " + song)
+        else:
+            print("歌单" + cmd_song_table + "不存在！")
 
 
 def merge_name(cmd):
@@ -176,25 +187,51 @@ def next_song():
         play_song(temp_cmd)
 
 
-def update_list():
+def update_local_list():
+    song_table['local'] = []
+    for i in os.listdir(audio_path):
+        song_table['local'].append(i)
+    update_song_table()  # 仅加入local歌单
+
+
+def update_list():  # 需要重新修改
     global song_list
     global song_num
-    song_list = os.listdir(audio_path)  # 刷新获取当前目录下的歌曲
-    song_num = len(song_list)
+    # song_list = os.listdir(audio_path)  # 刷新获取当前目录下的歌曲
+    # song_num = len(song_list)
+    # song_table['local'] = []
+    # for i in os.listdir(audio_path):
+    #     song_table['local'].append(i)
+    # update_song_table()     # 仅加入local歌单
+    update_local_list()
+
+
+def load_song_table():
+    global song_table
+    f = open(src_path + 'list.txt', 'rb')
+    if os.path.getsize(src_path + 'list.txt') > 0:
+        song_table = pickle.load(f)
+    f.close()
 
 
 #   初始化设置
 def init():
     global play_mode, song_table
+    global cur_song_table, song_list
     play_mode = RANDOM  # 默认播放方式为随机
     random.seed(time.time())
+    load_song_table()  # 先加载歌单
+
     update_list()  # 更新曲目
+
+    temp_cmd = ['use', 'local']
+    cur_song_table = 'local'
+    use_song_table(temp_cmd)  # 默认使用local歌单
+
     pygame.mixer.init()
 
-    f = open(src_path + 'list.txt', 'r')
-    if os.path.getsize(src_path + 'list.txt') > 0:
-        song_table = pickle.load(StrToBytes(f))
-    f.close()
+    if 'local' not in song_table.keys():
+        update_local_list()
 
 
 def change_mod(cmd):
@@ -214,9 +251,10 @@ def ps(cmd):
     print("当前播放方式:" + list(mod_dict.keys())[
         list(mod_dict.values()).index(play_mode)])  # 逆天通过值反查键，不过由于键值一一对应所以也没什么关系
     if cur_song != -1:
-        print("当前播放歌曲" + cur_song)
+        print("当前播放歌曲:" + cur_song)
     else:
         print("当前无播放歌曲")
+    print("当前歌单：" + cur_song_table)
 
 
 def get_search_text(cmd):
@@ -232,6 +270,7 @@ def get_search_text(cmd):
     return text
 
 
+# search需要重新修改以支持av号搜索
 def search(cmd):
     if len(cmd) == 1:
         print("请输入您想要搜索的内容\n")
@@ -283,7 +322,7 @@ def create(cmd):
         print("需要更多参数")
         return
 
-    if cmd[1] == 'table':
+    if cmd[1] == 'table':   # 这里其实是想保留创建更多其他结构的可能，但可能没有了
         list_name = merge_name(cmd[2:])
         if list_name in song_table.keys():
             print("歌单名重复，请重新考虑歌单名")
@@ -292,6 +331,13 @@ def create(cmd):
         f = open(src_path + "list.txt", "wb")
         pickle.dump(song_table, StrToBytes(f), 1)  # 二进制存储
         f.close()
+
+
+def update_song_table():  # 序列化写入
+    global song_table
+    f = open(src_path + "list.txt", "wb")
+    pickle.dump(song_table, StrToBytes(f), 1)
+    f.close()
 
 
 def update(cmd):
@@ -309,24 +355,36 @@ def update(cmd):
         return
 
     if cmd[3] not in song_list:
-        print("不存在歌曲" + cmd[3])
+        try:  # 尝试支持通过序号添加歌单歌曲
+            x = int(cmd[3])  # 只支持通过local歌单的列表来添加
+            if 0 <= x < len(song_table['local']):
+                value = song_table['local'][x]
+            else:
+                value = int('asdasdasd')    # 强行触发ValueError
+                print(value)
+        except ValueError:
+            print("不存在歌曲" + cmd[3])
+            return
+    else:
+        value = cmd[3]
 
     key = cmd[1]
     command = cmd[2]
-    value = cmd[3]
 
     # print(type(song_table[key]))
     if command == 'add':
         song_table[key].append(value)
 
-    f = open(src_path + "list.txt", "wb")
-    pickle.dump(song_table, StrToBytes(f), 1)
-    f.close()
+    update_song_table()
+    use_song_table(['use', cur_song_table]) # 更新当前歌单，防止ls出问题
+    # f = open(src_path + "list.txt", "wb")
+    # pickle.dump(song_table, StrToBytes(f), 1)
+    # f.close()
 
 
 def use_song_table(cmd):
-    global song_list
-    global song_num
+    global song_list, song_table
+    global song_num, cur_song_table
     if len(cmd) < 2:
         print("需要更多参数")
         return
@@ -335,7 +393,13 @@ def use_song_table(cmd):
         print("不存在歌单" + cmd[1])
         return
 
+    cur_song_table = cmd[1]
     song_list = []
     for value in song_table[cmd[1]]:
         song_list.append(value)
-    song_num = len(song_list)
+    song_num = len(song_list)  # 替换为我们选择的歌单
+
+
+def desc(cmd):  # 显示歌单信息
+    for i in song_table.keys():
+        print(str(list(song_table.keys()).index(i)) + ":" + i)
