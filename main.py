@@ -11,6 +11,8 @@ import function
 from function import *
 from window import *
 
+
+
 if __name__ == "__main__":
     print("Welcome to use bilibiliPlayer")
     os.chdir(audio_path)  # 切换到保存音频的目录下

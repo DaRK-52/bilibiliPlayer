@@ -1,0 +1,13 @@
+<RCC>
+  <qresource prefix="resource">
+    <file>images/no game no life.png</file>
+    <file>images/24gf-next.png</file>
+    <file>images/24gf-pause2.png</file>
+    <file>images/24gf-playlistMusic4.png</file>
+    <file>images/24gf-previousFrame.png</file>
+    <file>images/icons-sequence.png</file>
+    <file>images/loop.png</file>
+    <file>images/random.png</file>
+    <file>images/24gf-play.png</file>
+  </qresource>
+</RCC>

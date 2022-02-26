@@ -101,7 +101,7 @@ def add_song(cmd):
     os.system("ffmpeg -i E:/bilibiliPlayer/audio/temp.mp4 -vn \"" + audio_path + name + ".mp3\"")
     os.system("del/f/s/q temp.mp4")  # 下载视频， 转换成音频文件，删除temp文件
     os.system("del/f/s/q *.xml")  # 删除弹幕文件，由于当前目录在audio_path下，所以直接删除当前目录的xml文件就行
-    update_list()  # 更新歌曲列表
+    update_local_list()  # 更新歌曲列表
     use_song_table(['use', cur_song_table])  # 使用更新过的列表
 
 
@@ -190,7 +190,7 @@ def next_song():
         play_song(temp_cmd)
 
 
-def update_local_list():
+def update_local_list():  # 更新local歌单，用于add歌曲之后，或是init的时候
     global song_list
     global song_num
     global cur_song_table
@@ -198,19 +198,6 @@ def update_local_list():
     for i in os.listdir(audio_path):
         song_table['local'].append(i)
     update_song_table()  # 仅加入local歌单
-
-
-def update_list():  # 需要重新修改
-    global song_list
-    global song_num
-    global cur_song_table
-    # song_list = os.listdir(audio_path)  # 刷新获取当前目录下的歌曲
-    # song_num = len(song_list)
-    # song_table['local'] = []
-    # for i in os.listdir(audio_path):
-    #     song_table['local'].append(i)
-    # update_song_table()     # 仅加入local歌单
-    update_local_list()
 
 
 def load_song_table():
@@ -229,16 +216,13 @@ def init():
     random.seed(time.time())
     load_song_table()  # 先加载歌单
 
-    update_list()  # 更新曲目
+    update_local_list()  # 更新曲目
 
     temp_cmd = ['use', 'local']
     cur_song_table = 'local'
     use_song_table(temp_cmd)  # 默认使用local歌单
 
     pygame.mixer.init()
-
-    if 'local' not in song_table.keys():
-        update_local_list()
 
 
 def change_mod(cmd):
@@ -292,9 +276,10 @@ def re_match(result, flag):
             print(str(i) + " title:" + tmp[1] + " " + re.findall(r'av[a-zA-Z0-9]+', info)[0])
     return list1
 
+
 # search需要重新修改以支持av号搜索
 def search(cmd):
-    mode = 0    # 代表默认使用BV号模式，为1时表示使用av号下载
+    mode = 0  # 代表默认使用BV号模式，为1时表示使用av号下载
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64)", "Connection": "close"}
     if len(cmd) == 1:
         print("请输入您想要搜索的内容\n")
@@ -305,14 +290,7 @@ def search(cmd):
     r = requests.get("https://search.bilibili.com/all?keyword=" + search_text, headers=headers)
     result = re.findall(r'<a title=.*href="//www.bilibili.com/video/BV[A-Za-z0-9]+', r.text)  # 奇妙的正则匹配
 
-    title_list = []
     av_list = []
-
-    # for i, info in enumerate(result):
-    #     tmp = info.split("\"")
-    #     title_list.append(tmp[1])  # 纯纯的正则表达式匹配，匹配下来的第一个项是title所以它一定会夹在第一个"和第二个"间
-    #     BV_list.append(re.findall(r'BV[a-zA-Z0-9]+', info)[0])  # 将BV号加入列表
-    #     print(str(i) + " title:" + tmp[1] + " " + re.findall(r'BV[a-zA-Z0-9]+', info)[0])
 
     BV_list = re_match(result, 0)
     length_of_list = len(BV_list)
@@ -336,7 +314,7 @@ def search(cmd):
         print("请输入序号")
         return
 
-    if mode == 0:   # BV mode
+    if mode == 0:  # BV mode
         if len(select_cmd) == 1:
             temp_cmd = ['add', BV_list[int(select_cmd[0])], BV_list[int(select_cmd[0])]]
         else:
