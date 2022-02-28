@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import re
 import requests
@@ -9,14 +10,20 @@ import pickle
 import joblib
 import pygame
 import random
+
+from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QMainWindow
+
 from str2byte import *
+from main_window import *
+from my_window import *
 
 RANDOM = 0
 SEQUENCE = 1
 LOOP = 2  # 随机，列表，循环三种播放模式
 mod_dict = {'random': RANDOM, 'sequence': SEQUENCE, 'loop': LOOP}
 cmd_list = {'exit', 'play', 'add', 'next', 'ls', 'pause', 'unpause', 'help', 'chmod', 'ps', 'search', 'export',
-            'create', 'update', 'use', 'desc'}
+            'create', 'update', 'use', 'desc', 'gui'}
 
 audio_path = "E:/bilibiliPlayer/audio/"  # 建议修改为自己的路径，也可以使用export命令修改
 src_path = "E:/bilibiliPlayer/src_list/"
@@ -188,6 +195,11 @@ def next_song():
         x = x + 1  # 切换到下一首
         temp_cmd.append(song_list[x])
         play_song(temp_cmd)
+
+
+# TODO
+def previous_song():
+    return
 
 
 def update_local_list():  # 更新local歌单，用于add歌曲之后，或是init的时候
@@ -422,3 +434,10 @@ def use_song_table(cmd):
 def desc(cmd):  # 显示歌单信息
     for i in song_table.keys():
         print(str(list(song_table.keys()).index(i)) + ":" + i)
+
+
+def gui(cmd):
+    app = QApplication(sys.argv)
+    window = my_window()
+    window.show()
+    app.exec_()

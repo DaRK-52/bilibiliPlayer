@@ -11,8 +11,6 @@ import function
 from function import *
 from window import *
 
-
-
 if __name__ == "__main__":
     print("Welcome to use bilibiliPlayer")
     os.chdir(audio_path)  # 切换到保存音频的目录下
@@ -72,7 +70,7 @@ if __name__ == "__main__":
             search(cmd)
 
         if cmd[0] == "export":
-            export_path(cmd)    # 修改audio_path
+            export_path(cmd)  # 修改audio_path
 
         if cmd[0] == "create":
             create(cmd)
@@ -83,8 +81,11 @@ if __name__ == "__main__":
         if cmd[0] == "use":  # 选择歌单
             use_song_table(cmd)
 
-        if cmd[0] == "desc":    # 显示歌单信息
+        if cmd[0] == "desc":  # 显示歌单信息
             desc(cmd)
+
+        if cmd[0] == "gui":
+            gui(cmd)
 
         if not_cmd(cmd[0]):
             print("Exec " + cmd[0] + " Failed.Please check your command.")

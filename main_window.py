@@ -9,6 +9,17 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+import function
+
+res_path = "C:/Users/19147/PycharmProjects/bilibiliPlayer/images"
+cur_mod = 0
+
+
+def change_mod_button():
+    global cur_mod
+    cur_mod = (cur_mod + 1) % 3
+    mod = list(mod_dict.keys())[list(mod_dict.values()).index(cur_mod)]
+    function.change_mod(['chmod', mod])
 
 
 class Ui_MainWindow(object):
@@ -28,47 +39,51 @@ class Ui_MainWindow(object):
         self.play_mode_button.setStyleSheet("")
         self.play_mode_button.setText("")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("./images/random.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(res_path + "/random.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.play_mode_button.setIcon(icon)
         self.play_mode_button.setIconSize(QtCore.QSize(30, 30))
         self.play_mode_button.setFlat(True)
         self.play_mode_button.setObjectName("play_mode_button")
+        self.play_mode_button.clicked.connect(change_mod_button)
         self.horizontalLayout.addWidget(self.play_mode_button)
         self.previous_button = QtWidgets.QPushButton(self.horizontalLayoutWidget)
         self.previous_button.setStyleSheet("")
         self.previous_button.setText("")
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("./images/24gf-previousFrame.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap(res_path + "/24gf-previousFrame.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.previous_button.setIcon(icon1)
         self.previous_button.setIconSize(QtCore.QSize(30, 30))
         self.previous_button.setFlat(True)
         self.previous_button.setObjectName("previous_button")
+        # self.previous_button.clicked.connect()  # 之前那首
         self.horizontalLayout.addWidget(self.previous_button)
         self.play_button = QtWidgets.QPushButton(self.horizontalLayoutWidget)
         self.play_button.setStyleSheet("")
         self.play_button.setText("")
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap("./images/24gf-play.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap(res_path + "/24gf-play.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.play_button.setIcon(icon2)
         self.play_button.setIconSize(QtCore.QSize(30, 30))
         self.play_button.setFlat(True)
         self.play_button.setObjectName("play_button")
+        self.play_button.clicked.connect(function.play_song)
         self.horizontalLayout.addWidget(self.play_button)
         self.next_button = QtWidgets.QPushButton(self.horizontalLayoutWidget)
         self.next_button.setStyleSheet("")
         self.next_button.setText("")
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap("./images/24gf-next.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap(res_path + "/24gf-next.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.next_button.setIcon(icon3)
         self.next_button.setIconSize(QtCore.QSize(30, 30))
         self.next_button.setFlat(True)
         self.next_button.setObjectName("next_button")
+        self.next_button.clicked.connect(function.next_song)
         self.horizontalLayout.addWidget(self.next_button)
         self.play_table_song_button = QtWidgets.QPushButton(self.horizontalLayoutWidget)
         self.play_table_song_button.setStyleSheet("")
         self.play_table_song_button.setText("")
         icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap("./images/24gf-playlistMusic4.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon4.addPixmap(QtGui.QPixmap(res_path + "/24gf-playlistMusic4.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.play_table_song_button.setIcon(icon4)
         self.play_table_song_button.setIconSize(QtCore.QSize(30, 30))
         self.play_table_song_button.setFlat(True)
@@ -87,7 +102,7 @@ class Ui_MainWindow(object):
         self.graphicsView.setMinimumSize(QtCore.QSize(300, 300))
         self.graphicsView.setMaximumSize(QtCore.QSize(300, 300))
         self.graphicsView.setStyleSheet("border-radius: 150px;\n"
-                                        "background-image: url(./images/no game no life.png);pix")
+                                        "background-image: url(" + res_path + "/no game no life.png);pix")
         self.graphicsView.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.graphicsView.setObjectName("graphicsView")
         self.progressBar = QtWidgets.QProgressBar(self.centralwidget)
