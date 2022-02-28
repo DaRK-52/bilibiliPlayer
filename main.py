@@ -24,7 +24,7 @@ if __name__ == "__main__":
         cmd = raw_cmd.split(" ")
 
         # 待解决：如何解决多个if的问题，是否能用类似switch的方式解决
-        # 能否直接通过搜索关键词找到BV号  # BV号已完成，但它改成av号了我真吐了
+        # 能否直接通过搜索关键词找到BV号  # vBV号已完成，但它改成av号了我真吐了
         # 下载封面功能
         # 增加分组功能，类似于分歌单，暂时先拿文件存歌单，之后再考虑数据库连接   # 序列化版本已完成
         # GUI
@@ -51,14 +51,17 @@ if __name__ == "__main__":
         if cmd[0] == "next":
             next_song()
 
+        if cmd[0] == "previous":
+            previous_song()
+
         if cmd[0] == "ls":
             print_list(cmd)
 
         if cmd[0] == "pause":
-            pygame.mixer.music.pause()
+            pause()
 
         if cmd[0] == "unpause":
-            pygame.mixer.music.unpause()
+            unpause()
 
         if cmd[0] == "chmod":  # 更改播放模式
             change_mod(cmd)

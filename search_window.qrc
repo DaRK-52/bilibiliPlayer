@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="image">
+    <file>images/no game no life.png</file>
+  </qresource>
+</RCC>

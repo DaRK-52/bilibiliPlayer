@@ -22,7 +22,7 @@ RANDOM = 0
 SEQUENCE = 1
 LOOP = 2  # 随机，列表，循环三种播放模式
 mod_dict = {'random': RANDOM, 'sequence': SEQUENCE, 'loop': LOOP}
-cmd_list = {'exit', 'play', 'add', 'next', 'ls', 'pause', 'unpause', 'help', 'chmod', 'ps', 'search', 'export',
+cmd_list = {'exit', 'play', 'add', 'next', 'previous', 'ls', 'pause', 'unpause', 'help', 'chmod', 'ps', 'search', 'export',
             'create', 'update', 'use', 'desc', 'gui'}
 
 audio_path = "E:/bilibiliPlayer/audio/"  # 建议修改为自己的路径，也可以使用export命令修改
@@ -35,6 +35,7 @@ cur_song_table = ''  # 记录当前播放的歌单名
 
 play_mode = RANDOM  # 默认随机播放
 song_list = []  # 待播放歌曲列表
+history_song_list = []  # 历史记录，也可以用于寻找前一首歌
 song_num = 0  # 歌曲数量
 cur_song = -1  # 正在播放的歌曲， 防止随机播放播放出同一首哥
 start_flag = False
@@ -120,7 +121,9 @@ def check_song_not_exist(song):
 
 
 def pygame_play_song(path, file):
-    global cur_song
+    global cur_song, history_song_list
+    if cur_song != -1:
+        history_song_list.append(cur_song)
     cur_song = file
     pygame.mixer.music.load(path + file)
     pygame.mixer.music.play()
@@ -181,6 +184,7 @@ def listener():  # 监听歌曲是否结束，如果结束就切下一首歌
 
 
 def next_song():
+    global cur_song
     temp_cmd = ['play']
     if play_mode == LOOP:
         # print("You are in loop mode, next song will still be the same")
@@ -197,8 +201,17 @@ def next_song():
         play_song(temp_cmd)
 
 
-# TODO
+# TODO:还有点问题，可能需要重构
 def previous_song():
+    global history_song_list
+    if len(history_song_list) == 0:
+        print("无历史歌曲，将随机播放")
+        play_song(['play'])
+        return
+
+    temp_cmd = ['play', history_song_list.pop()]
+    play_song(temp_cmd)
+    history_song_list.pop() # 多退一个
     return
 
 
@@ -441,3 +454,11 @@ def gui(cmd):
     window = my_window()
     window.show()
     app.exec_()
+
+
+def pause():
+    pygame.mixer.music.pause()
+
+
+def unpause():
+    pygame.mixer.music.unpause()
