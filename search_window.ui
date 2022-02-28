@@ -17,8 +17,8 @@
    <widget class="QLineEdit" name="SearchEdit">
     <property name="geometry">
      <rect>
-      <x>32</x>
-      <y>60</y>
+      <x>30</x>
+      <y>110</y>
       <width>531</width>
       <height>41</height>
      </rect>
@@ -31,19 +31,22 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>140</y>
+      <y>190</y>
       <width>531</width>
       <height>561</height>
      </rect>
+    </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::NoEditTriggers</set>
+    </property>
+    <property name="selectionBehavior">
+     <enum>QAbstractItemView::SelectRows</enum>
     </property>
     <property name="showGrid">
      <bool>false</bool>
     </property>
     <property name="wordWrap">
      <bool>true</bool>
-    </property>
-    <property name="rowCount">
-     <number>10</number>
     </property>
     <property name="columnCount">
      <number>2</number>
@@ -52,7 +55,7 @@
      <bool>false</bool>
     </attribute>
     <attribute name="horizontalHeaderCascadingSectionResizes">
-     <bool>false</bool>
+     <bool>true</bool>
     </attribute>
     <attribute name="horizontalHeaderDefaultSectionSize">
      <number>250</number>
@@ -66,18 +69,37 @@
     <attribute name="verticalHeaderDefaultSectionSize">
      <number>55</number>
     </attribute>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
-    <row/>
     <column/>
     <column/>
+   </widget>
+   <widget class="QPushButton" name="change_page_button">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>30</y>
+      <width>91</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset resource="main_window.qrc">
+      <normaloff>:/resource/images/down.png</normaloff>:/resource/images/down.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>30</width>
+      <height>30</height>
+     </size>
+    </property>
+    <property name="flat">
+     <bool>true</bool>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -94,6 +116,7 @@
  </widget>
  <resources>
   <include location="search_window.qrc"/>
+  <include location="main_window.qrc"/>
  </resources>
  <connections/>
 </ui>

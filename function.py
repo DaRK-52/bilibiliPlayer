@@ -7,7 +7,6 @@ import win32con
 import win32api
 import threading
 import pickle
-import joblib
 import pygame
 import random
 
@@ -37,7 +36,8 @@ play_mode = RANDOM  # 默认随机播放
 song_list = []  # 待播放歌曲列表
 history_song_list = []  # 历史记录，也可以用于寻找前一首歌
 song_num = 0  # 歌曲数量
-cur_song = -1  # 正在播放的歌曲， 防止随机播放播放出同一首哥
+cur_song = -1  # 正在播放的歌曲， 防止随机播放播放出同一首歌
+gui_mode = False    # 判断是否是gui还是cli
 start_flag = False
 close_flag = False  # 关闭标识，用于结束监听线程
 
@@ -299,11 +299,12 @@ def re_match(result, flag):
         elif flag == 1:
             list1.append(re.findall(r'av[a-zA-Z0-9]+', info)[0])  # 将BV号加入列表
             print(str(i) + " title:" + tmp[1] + " " + re.findall(r'av[a-zA-Z0-9]+', info)[0])
-    return list1
+    return list1, title_list
 
 
 # search需要重新修改以支持av号搜索
 def search(cmd):
+    global gui_mode
     mode = 0  # 代表默认使用BV号模式，为1时表示使用av号下载
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64)", "Connection": "close"}
     if len(cmd) == 1:
@@ -316,14 +317,20 @@ def search(cmd):
     result = re.findall(r'<a title=.*href="//www.bilibili.com/video/BV[A-Za-z0-9]+', r.text)  # 奇妙的正则匹配
 
     av_list = []
+    title_list = []
 
-    BV_list = re_match(result, 0)
+    BV_list, title_list = re_match(result, 0)
     length_of_list = len(BV_list)
     if len(BV_list) == 0:
         result = re.findall(r'<a title=.*href="//www.bilibili.com/video/av[A-Za-z0-9]+', r.text)  # 奇妙的正则匹配
-        av_list = re_match(result, 1)
+        av_list, title_list = re_match(result, 1)
         mode = 1
         length_of_list = len(av_list)
+        if gui_mode:
+            return title_list, av_list
+
+    if gui_mode:
+        return title_list, BV_list
 
     print('请选择您想下载的音乐（输入序号与歌曲名即可（无歌曲名默认为BV或av号）,若无输入back即可）')
 
@@ -450,10 +457,13 @@ def desc(cmd):  # 显示歌单信息
 
 
 def gui(cmd):
+    global gui_mode
     app = QApplication(sys.argv)
+    gui_mode = True
     window = my_window()
     window.show()
     app.exec_()
+    gui_mode = False
 
 
 def pause():
