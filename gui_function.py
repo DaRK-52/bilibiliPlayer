@@ -1,5 +1,6 @@
 # from function import *
 from PyQt5 import QtGui, QtCore
+from PyQt5.QtWidgets import QTableWidgetItem
 
 import function  # 防止from xxx import * 死锁
 
@@ -16,7 +17,16 @@ def static_vars(**kwargs):
     return decorate
 
 
-@static_vars()
+def gui_switch_song(window, string):
+    global play_flag
+    temp_cmd = ['play', string]
+    function.start_flag = True
+    play_flag = 0 # 正在播放
+    function.play_song(temp_cmd)
+    window.song_title.setText(function.cur_song)
+    swap_icon(play_flag, window)
+
+
 def gui_play_song(window):
     global play_flag
     if not function.start_flag:
@@ -66,7 +76,41 @@ def gui_search(string):
     return function.search(temp_cmd)
 
 
-def gui_add_song(av, name):   # 参数是BV号或者av号
+def gui_add_song(av, name):  # 参数是BV号或者av号
     temp_cmd = ['add', av, name]
     print(temp_cmd)
     function.add_song(temp_cmd)
+
+
+@static_vars(mode=0)
+def gui_chmod(window):
+    icon = QtGui.QIcon()
+    gui_chmod.mode = (gui_chmod.mode + 1) % 3
+    if gui_chmod.mode == 1:
+        function.change_mod(['chmod', 'sequence'])
+        icon.addPixmap(QtGui.QPixmap(res_path + "/images/icons-sequence.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+    elif gui_chmod.mode == 2:
+        function.change_mod(['chmod', 'loop'])
+        icon.addPixmap(QtGui.QPixmap(res_path + "/images/loop.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+    elif gui_chmod.mode == 0:
+        function.change_mod(['chmod', 'random'])
+        icon.addPixmap(QtGui.QPixmap(res_path + "/images/random.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+
+    window.play_mode_button.setIcon(icon)
+    window.play_mode_button.setIconSize(QtCore.QSize(30, 30))
+
+
+@static_vars(flag=0)
+def gui_play_list(window):
+    song_list = function.print_list(['ls'])
+    gui_play_list.flag = not gui_play_list.flag
+
+    if gui_play_list.flag:
+        for index, song in enumerate(song_list):
+            window.song_list_page.tableWidget.insertRow(index)
+            window.song_list_page.tableWidget.setItem(index, 0, QTableWidgetItem(song))
+        window.song_list_page.show()
+    else:
+        window.song_list_page.tableWidget.clear()
+        window.song_list_page.tableWidget.setRowCount(0)
+        window.song_list_page.hide()

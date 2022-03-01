@@ -41,6 +41,8 @@ gui_mode = False    # 判断是否是gui还是cli
 start_flag = False
 close_flag = False  # 关闭标识，用于结束监听线程
 
+window = 1  # 存放窗口
+
 
 def print_help():
     f = open(src_path + "readme.txt", encoding="utf-8")
@@ -55,11 +57,13 @@ def print_list(cmd):  # 支持查看歌单里面的内容
     if len(cmd) == 1:
         for song in song_list:
             print(str(song_list.index(song)) + ": " + song)
+        return song_list
     else:
         cmd_song_table = cmd[1]  # 想来想去觉得还是不要有空格比较好
         if cmd_song_table in song_table.keys():
             for song in song_table[cmd_song_table]:
                 print(str(song_table[cmd_song_table].index(song)) + ": " + song)
+            return song_table[cmd_song_table]
         else:
             print("歌单" + cmd_song_table + "不存在！")
 
@@ -181,6 +185,8 @@ def listener():  # 监听歌曲是否结束，如果结束就切下一首歌
             if close_flag:  # 判断程序是否结束
                 break
             next_song()
+            if gui_mode:
+                window.song_title.setText(cur_song)
 
 
 def next_song():
@@ -457,7 +463,7 @@ def desc(cmd):  # 显示歌单信息
 
 
 def gui(cmd):
-    global gui_mode
+    global gui_mode, window
     app = QApplication(sys.argv)
     gui_mode = True
     window = my_window()

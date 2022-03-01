@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QMainWindow
 from main_window import *
 from gui_function import *
 from search_window import *
+from song_list_window import *
 
 res_path = 'C:/Users/19147/PycharmProjects/bilibiliPlayer'
 
@@ -11,10 +12,18 @@ res_path = 'C:/Users/19147/PycharmProjects/bilibiliPlayer'
 class search_window(QMainWindow, Ui_SearchWindow):
     def __init__(self, parent=None):
         super(search_window, self).__init__(parent)
+        self.main_w = None
         self.setupUi(self)
+        self.configure_button()
         self.table_row_num = 0 # 表格的行数
         self.tableWidget.doubleClicked.connect(self.add_song)
         self.setFixedSize(600, 800)
+
+    def configure_button(self):
+        self.change_page_button.clicked.connect(self.change_page)
+
+    def set_main(self, main_w):
+        self.main_w = main_w
 
     def add_song(self):
         av = self.tableWidget.selectedItems()[1].text()    # 获取av号或者bv号
@@ -27,6 +36,8 @@ class search_window(QMainWindow, Ui_SearchWindow):
 
     def update_table(self, list1, list2):
         self.tableWidget.clear()
+        self.tableWidget.setRowCount(0)
+        self.table_row_num = 0
         while self.table_row_num < len(list1):
             self.tableWidget.insertRow(self.table_row_num)
 
@@ -39,25 +50,55 @@ class search_window(QMainWindow, Ui_SearchWindow):
             self.search(self.SearchEdit.text())
             pass
 
+    def change_page(self):
+        self.hide()
+        self.tableWidget.clear()    # 清除搜索结果
+        self.SearchEdit.clear() # 清除搜索内容
+        self.tableWidget.setRowCount(0)
+        self.table_row_num = 0
+        self.main_w.show()
+
+
+class song_list_window(QMainWindow, Ui_SongListWindow):
+    def __init__(self, parent=None):
+        super(song_list_window, self).__init__(parent)
+        self.main_w = None
+        self.setupUi(self)
+        self.setFixedSize(self.width(), self.height())
+        self.setWindowFlags(Qt.WindowMinimizeButtonHint)
+        self.tableWidget.doubleClicked.connect(lambda: self.play(self.tableWidget.selectedItems()[0].text()))
+
+    def set_main(self, main_w):
+        self.main_w = main_w
+
+    def play(self, string):
+        gui_switch_song(self.main_w, string)
+
 
 class my_window(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(my_window, self).__init__(parent)
         self.setupUi(self)
+        self.setStyleSheet("background-image: url(" + res_path + "/images/backgroud2.jpeg);")
         self.search_page = search_window()
+        self.search_page.set_main(self)
         self.search_page.tableWidget.setColumnWidth(0, 380)
         self.search_page.tableWidget.setColumnWidth(1, 125)
-        self.page = "main"
+
+        self.song_list_page = song_list_window()
+        self.song_list_page.set_main(self)
+
         self.configure_button()
         self.setIcon()
         self.setFixedSize(600, 800)
 
     def configure_button(self):  # 配置button
+        self.play_mode_button.clicked.connect(lambda: gui_chmod(self))
         self.play_button.clicked.connect(lambda: gui_play_song(self))
         self.next_button.clicked.connect(lambda: gui_next(self))
         self.previous_button.clicked.connect(lambda: gui_previous(self))
+        self.play_table_song_button.clicked.connect(lambda: gui_play_list(self))
         self.change_page_button.clicked.connect(self.change_page)
-        self.search_page.change_page_button.clicked.connect(self.change_page)
 
     def setIcon(self):
         icon = QtGui.QIcon()
@@ -103,17 +144,8 @@ class my_window(QMainWindow, Ui_MainWindow):
         self.search_page.change_page_button.setFlat(True)
 
     def change_page(self):
-        if self.page == "main":
-            self.search_page.show()
-            self.hide()
-            self.page = "search"
-        else:
-            self.search_page.hide()
-            self.search_page.tableWidget.clear()    # 清除搜索结果
-            self.search_page.SearchEdit.clear() # 清除搜索内容
-            self.search_page.table_row_num = 0
-            self.show()
-            self.page = "main"
+        self.search_page.show()
+        self.hide()
 
     def closeEvent(self, event):
         pass

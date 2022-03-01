@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="resource">
+    <file>images/backgroud2.jpeg</file>
+    <file>images/backgroud-main.jpeg</file>
     <file>images/down.png</file>
     <file>images/no game no life.png</file>
     <file>images/24gf-next.png</file>
