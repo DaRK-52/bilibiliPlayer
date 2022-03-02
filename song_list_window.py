@@ -22,6 +22,7 @@ class Ui_SongListWindow(object):
         self.tableWidget.setMinimumSize(QtCore.QSize(0, 0))
         self.tableWidget.setLineWidth(1)
         self.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.tableWidget.setShowGrid(False)
         self.tableWidget.setColumnCount(1)
         self.tableWidget.setObjectName("tableWidget")
         self.tableWidget.setRowCount(0)

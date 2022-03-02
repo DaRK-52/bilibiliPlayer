@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>800</height>
+    <width>360</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,8 +22,8 @@
      <rect>
       <x>30</x>
       <y>110</y>
-      <width>531</width>
-      <height>41</height>
+      <width>300</width>
+      <height>40</height>
      </rect>
     </property>
     <property name="autoFillBackground">
@@ -40,9 +40,9 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>190</y>
-      <width>531</width>
-      <height>561</height>
+      <y>180</y>
+      <width>300</width>
+      <height>400</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -87,30 +87,82 @@
    <widget class="QPushButton" name="change_page_button">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>30</y>
-      <width>91</width>
-      <height>41</height>
+      <x>270</x>
+      <y>36</y>
+      <width>48</width>
+      <height>48</height>
      </rect>
     </property>
-    <property name="styleSheet">
-     <string notr="true"/>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>48</width>
+      <height>48</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>48</width>
+      <height>48</height>
+     </size>
+    </property>
+    <property name="toolTip">
+     <string>下载当前播放歌曲</string>
     </property>
     <property name="text">
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="main_window.qrc">
-      <normaloff>:/resource/images/down.png</normaloff>:/resource/images/down.png</iconset>
+     <iconset resource="music_window.qrc">
+      <normaloff>:/ico/images/ico/add_to_list.png</normaloff>:/ico/images/ico/add_to_list.png</iconset>
     </property>
     <property name="iconSize">
      <size>
-      <width>30</width>
-      <height>30</height>
+      <width>48</width>
+      <height>48</height>
      </size>
     </property>
     <property name="flat">
      <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="disc_3">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>20</y>
+      <width>64</width>
+      <height>64</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>64</width>
+      <height>64</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>64</width>
+      <height>64</height>
+     </size>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::NoFrame</enum>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>images/ico/disc.png</pixmap>
     </property>
    </widget>
   </widget>
@@ -118,6 +170,7 @@
  <resources>
   <include location="search_window.qrc"/>
   <include location="main_window.qrc"/>
+  <include location="music_window.qrc"/>
  </resources>
  <connections/>
 </ui>

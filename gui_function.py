@@ -60,12 +60,12 @@ def gui_previous(window):
 
 def swap_icon(flag, window):
     icon = QtGui.QIcon()
-    icon.addPixmap(QtGui.QPixmap(res_path + "/images/24gf-play.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+    icon.addPixmap(QtGui.QPixmap(res_path + "/images/ico/start.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
     if flag:
         window.play_button.setIcon(icon)
         window.play_button.setIconSize(QtCore.QSize(30, 30))
     else:
-        icon.addPixmap(QtGui.QPixmap(res_path + "/images/24gf-pause2.png"), QtGui.QIcon.Normal,
+        icon.addPixmap(QtGui.QPixmap(res_path + "/images/ico/stop.png"), QtGui.QIcon.Normal,
                        QtGui.QIcon.Off)  # play和pause图标是指下一个状态是play还是pause...
         window.play_button.setIcon(icon)
         window.play_button.setIconSize(QtCore.QSize(30, 30))
@@ -88,13 +88,13 @@ def gui_chmod(window):
     gui_chmod.mode = (gui_chmod.mode + 1) % 3
     if gui_chmod.mode == 1:
         function.change_mod(['chmod', 'sequence'])
-        icon.addPixmap(QtGui.QPixmap(res_path + "/images/icons-sequence.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(res_path + "/images/ico/cycle.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
     elif gui_chmod.mode == 2:
         function.change_mod(['chmod', 'loop'])
-        icon.addPixmap(QtGui.QPixmap(res_path + "/images/loop.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(res_path + "/images/ico/cycle_one.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
     elif gui_chmod.mode == 0:
         function.change_mod(['chmod', 'random'])
-        icon.addPixmap(QtGui.QPixmap(res_path + "/images/random.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(res_path + "/images/ico/random.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 
     window.play_mode_button.setIcon(icon)
     window.play_mode_button.setIconSize(QtCore.QSize(30, 30))

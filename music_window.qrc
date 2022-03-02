@@ -1,0 +1,26 @@
+<RCC>
+  <qresource prefix="ico">
+    <file>images/ico/add.png</file>
+    <file>images/ico/add_to_list.png</file>
+    <file>images/ico/center_volume.png</file>
+    <file>images/ico/cycle.png</file>
+    <file>images/ico/cycle_one.png</file>
+    <file>images/ico/de.png</file>
+    <file>images/ico/delete.png</file>
+    <file>images/ico/disc.png</file>
+    <file>images/ico/downloads.png</file>
+    <file>images/ico/high_volume.png</file>
+    <file>images/ico/kk-music.ico</file>
+    <file>images/ico/logo.png</file>
+    <file>images/ico/music.png</file>
+    <file>images/ico/my_playlist.png</file>
+    <file>images/ico/no_volume.png</file>
+    <file>images/ico/on.png</file>
+    <file>images/ico/open_folder.png</file>
+    <file>images/ico/random.png</file>
+    <file>images/ico/small_volume.png</file>
+    <file>images/ico/song.png</file>
+    <file>images/ico/start.png</file>
+    <file>images/ico/stop.png</file>
+  </qresource>
+</RCC>

@@ -2,6 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QTableWidgetItem
 from PyQt5.QtWidgets import QMainWindow
 from main_window import *
+from new_main_window import *
 from gui_function import *
 from search_window import *
 from song_list_window import *
@@ -14,20 +15,31 @@ class search_window(QMainWindow, Ui_SearchWindow):
         super(search_window, self).__init__(parent)
         self.main_w = None
         self.setupUi(self)
+        self.setIcon()
         self.configure_button()
-        self.table_row_num = 0 # 表格的行数
+        self.table_row_num = 0  # 表格的行数
         self.tableWidget.doubleClicked.connect(self.add_song)
-        self.setFixedSize(600, 800)
+        self.setGeometry(1200, 180, 360, 600)
+        self.setFixedSize(360, 600)
 
     def configure_button(self):
         self.change_page_button.clicked.connect(self.change_page)
+
+    def setIcon(self):
+        self.disc_3.setPixmap(QtGui.QPixmap(res_path + "/images/ico/disc.png"))
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(res_path + "/images/ico/add_to_list.png"), QtGui.QIcon.Normal,
+                       QtGui.QIcon.Off)
+        self.change_page_button.setIcon(icon)
+        self.change_page_button.setIconSize(QtCore.QSize(30, 30))
+        self.change_page_button.setFlat(True)
 
     def set_main(self, main_w):
         self.main_w = main_w
 
     def add_song(self):
-        av = self.tableWidget.selectedItems()[1].text()    # 获取av号或者bv号
-        name = self.SearchEdit.text()   # 先不支持自定义文件名，直接拿搜索的字段命名
+        av = self.tableWidget.selectedItems()[1].text()  # 获取av号或者bv号
+        name = self.SearchEdit.text()  # 先不支持自定义文件名，直接拿搜索的字段命名
         gui_add_song(av, name)
 
     def search(self, string):
@@ -52,8 +64,8 @@ class search_window(QMainWindow, Ui_SearchWindow):
 
     def change_page(self):
         self.hide()
-        self.tableWidget.clear()    # 清除搜索结果
-        self.SearchEdit.clear() # 清除搜索内容
+        self.tableWidget.clear()  # 清除搜索结果
+        self.SearchEdit.clear()  # 清除搜索内容
         self.tableWidget.setRowCount(0)
         self.table_row_num = 0
         self.main_w.show()
@@ -64,6 +76,7 @@ class song_list_window(QMainWindow, Ui_SongListWindow):
         super(song_list_window, self).__init__(parent)
         self.main_w = None
         self.setupUi(self)
+        self.setGeometry(1200, 380, self.width(), self.height())
         self.setFixedSize(self.width(), self.height())
         self.setWindowFlags(Qt.WindowMinimizeButtonHint)
         self.tableWidget.doubleClicked.connect(lambda: self.play(self.tableWidget.selectedItems()[0].text()))
@@ -75,11 +88,10 @@ class song_list_window(QMainWindow, Ui_SongListWindow):
         gui_switch_song(self.main_w, string)
 
 
-class my_window(QMainWindow, Ui_MainWindow):
+class my_window(QMainWindow, Ui_New_MainWindow):
     def __init__(self, parent=None):
         super(my_window, self).__init__(parent)
         self.setupUi(self)
-        self.setStyleSheet("background-image: url(" + res_path + "/images/backgroud2.jpeg);")
         self.search_page = search_window()
         self.search_page.set_main(self)
         self.search_page.tableWidget.setColumnWidth(0, 380)
@@ -90,7 +102,8 @@ class my_window(QMainWindow, Ui_MainWindow):
 
         self.configure_button()
         self.setIcon()
-        self.setFixedSize(600, 800)
+        self.setGeometry(800, 600, 400, 180);
+        self.setFixedSize(400, 180)
 
     def configure_button(self):  # 配置button
         self.play_mode_button.clicked.connect(lambda: gui_chmod(self))
@@ -101,47 +114,43 @@ class my_window(QMainWindow, Ui_MainWindow):
         self.change_page_button.clicked.connect(self.change_page)
 
     def setIcon(self):
+        self.disc_3.setPixmap(QtGui.QPixmap(res_path + "/images/ico/disc.png"))
+
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(res_path + "/images/random.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(res_path + "/images/ico/random.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.play_mode_button.setIcon(icon)
         self.play_mode_button.setIconSize(QtCore.QSize(30, 30))
 
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(res_path + "/images/24gf-previousFrame.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap(res_path + "/images/ico/on.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.previous_button.setIcon(icon1)
         self.previous_button.setIconSize(QtCore.QSize(30, 30))
 
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(res_path + "/images/24gf-play.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap(res_path + "/images/ico/start.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.play_button.setIcon(icon2)
         self.play_button.setIconSize(QtCore.QSize(30, 30))
 
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(res_path + "/images/24gf-next.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap(res_path + "/images/ico/de.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.next_button.setIcon(icon3)
         self.next_button.setIconSize(QtCore.QSize(30, 30))
 
         icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap(res_path + "/images/24gf-playlistMusic4.png"), QtGui.QIcon.Normal,
+        icon4.addPixmap(QtGui.QPixmap(res_path + "/images/ico/open_folder.png"), QtGui.QIcon.Normal,
                         QtGui.QIcon.Off)
         self.play_table_song_button.setIcon(icon4)
         self.play_table_song_button.setIconSize(QtCore.QSize(30, 30))
 
-        self.graphicsView.setStyleSheet("border-radius: 150px;\n"
-                                        "background-image: url(" + res_path + "/images/no game no life.png);pix")
-
         icon5 = QtGui.QIcon()
-        icon5.addPixmap(QtGui.QPixmap(res_path + "/images/windowIcon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon5.addPixmap(QtGui.QPixmap(res_path + "/images/ico/disc1.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.setWindowIcon(icon5)
 
         icon6 = QtGui.QIcon()
-        icon6.addPixmap(QtGui.QPixmap(res_path + "/images/down.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon6.addPixmap(QtGui.QPixmap(res_path + "/images/ico/add_to_list.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.change_page_button.setIcon(icon6)
         self.change_page_button.setIconSize(QtCore.QSize(30, 30))
         self.change_page_button.setFlat(True)
-        self.search_page.change_page_button.setIcon(icon6)
-        self.search_page.change_page_button.setIconSize(QtCore.QSize(30, 30))
-        self.search_page.change_page_button.setFlat(True)
 
     def change_page(self):
         self.search_page.show()
