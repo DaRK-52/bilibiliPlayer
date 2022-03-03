@@ -13,6 +13,7 @@ from window import *
 
 if __name__ == "__main__":
     print("Welcome to use bilibiliPlayer")
+    set_env()
     os.chdir(audio_path)  # 切换到保存音频的目录下
     init()  # 初始化设置
     listener_thread = threading.Thread(target=listener, args=())

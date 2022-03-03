@@ -21,11 +21,13 @@ RANDOM = 0
 SEQUENCE = 1
 LOOP = 2  # 随机，列表，循环三种播放模式
 mod_dict = {'random': RANDOM, 'sequence': SEQUENCE, 'loop': LOOP}
-cmd_list = {'exit', 'play', 'add', 'next', 'previous', 'ls', 'pause', 'unpause', 'help', 'chmod', 'ps', 'search', 'export',
+cmd_list = {'exit', 'play', 'add', 'next', 'previous', 'ls', 'pause', 'unpause', 'help', 'chmod', 'ps', 'search',
+            'export',
             'create', 'update', 'use', 'desc', 'gui'}
 
 audio_path = "E:/bilibiliPlayer/audio/"  # 建议修改为自己的路径，也可以使用export命令修改
 src_path = "E:/bilibiliPlayer/src_list/"
+res_path = "123123123"
 
 # 其中的local歌单是当前目录下的所有歌曲
 song_table = {}  # 存放歌单相关信息，会把它序列化
@@ -37,11 +39,20 @@ song_list = []  # 待播放歌曲列表
 history_song_list = []  # 历史记录，也可以用于寻找前一首歌
 song_num = 0  # 歌曲数量
 cur_song = -1  # 正在播放的歌曲， 防止随机播放播放出同一首歌
-gui_mode = False    # 判断是否是gui还是cli
+gui_mode = False  # 判断是否是gui还是cli
 start_flag = False
 close_flag = False  # 关闭标识，用于结束监听线程
 
 window = 1  # 存放窗口
+
+
+def set_env():  # 设置环境
+    global audio_path, src_path, res_path
+    f = open("./resources/settings.txt", "r", encoding='utf-8')
+    audio_path = re.split(r'[\s]', f.readline().strip())[0]
+    src_path = re.split(r'[\s]', f.readline().strip())[0]
+    res_path = re.split(r'[\s]', f.readline().strip())[0]
+    pass
 
 
 def print_help():
@@ -217,7 +228,7 @@ def previous_song():
 
     temp_cmd = ['play', history_song_list.pop()]
     play_song(temp_cmd)
-    history_song_list.pop() # 多退一个
+    history_song_list.pop()  # 多退一个
     return
 
 

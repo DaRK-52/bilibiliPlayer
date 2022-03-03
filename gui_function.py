@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QTableWidgetItem
 
 import function  # 防止from xxx import * 死锁
 
-res_path = 'C:/Users/19147/PycharmProjects/bilibiliPlayer'
+# res_path = "C:/Users/19147/PycharmProjects/bilibiliPlayer/resources/images/"
 play_flag = 0
 
 
@@ -59,13 +59,15 @@ def gui_previous(window):
 
 
 def swap_icon(flag, window):
+    res_path = function.res_path
+
     icon = QtGui.QIcon()
-    icon.addPixmap(QtGui.QPixmap(res_path + "/images/ico/start.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+    icon.addPixmap(QtGui.QPixmap(res_path + "start.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
     if flag:
         window.play_button.setIcon(icon)
         window.play_button.setIconSize(QtCore.QSize(30, 30))
     else:
-        icon.addPixmap(QtGui.QPixmap(res_path + "/images/ico/stop.png"), QtGui.QIcon.Normal,
+        icon.addPixmap(QtGui.QPixmap(res_path + "stop.png"), QtGui.QIcon.Normal,
                        QtGui.QIcon.Off)  # play和pause图标是指下一个状态是play还是pause...
         window.play_button.setIcon(icon)
         window.play_button.setIconSize(QtCore.QSize(30, 30))
@@ -84,17 +86,18 @@ def gui_add_song(av, name):  # 参数是BV号或者av号
 
 @static_vars(mode=0)
 def gui_chmod(window):
+    res_path = function.res_path
     icon = QtGui.QIcon()
     gui_chmod.mode = (gui_chmod.mode + 1) % 3
     if gui_chmod.mode == 1:
         function.change_mod(['chmod', 'sequence'])
-        icon.addPixmap(QtGui.QPixmap(res_path + "/images/ico/cycle.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(res_path + "cycle.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
     elif gui_chmod.mode == 2:
         function.change_mod(['chmod', 'loop'])
-        icon.addPixmap(QtGui.QPixmap(res_path + "/images/ico/cycle_one.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(res_path + "cycle_one.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
     elif gui_chmod.mode == 0:
         function.change_mod(['chmod', 'random'])
-        icon.addPixmap(QtGui.QPixmap(res_path + "/images/ico/random.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(res_path + "random.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 
     window.play_mode_button.setIcon(icon)
     window.play_mode_button.setIconSize(QtCore.QSize(30, 30))
