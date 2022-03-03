@@ -73,4 +73,4 @@ class Ui_SearchWindow(object):
         _translate = QtCore.QCoreApplication.translate
         SearchWindow.setWindowTitle(_translate("SearchWindow", "SearchWindow"))
         self.SearchEdit.setPlaceholderText(_translate("SearchWindow", "请搜索"))
-        self.change_page_button.setToolTip(_translate("SearchWindow", "下载当前播放歌曲"))
+        self.change_page_button.setToolTip(_translate("SearchWindow", ""))

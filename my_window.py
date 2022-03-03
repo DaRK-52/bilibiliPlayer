@@ -30,11 +30,7 @@ class search_window(QMainWindow, Ui_SearchWindow):
     def set_icon(self):
         res_path = function.res_path
         self.disc_3.setPixmap(QtGui.QPixmap(res_path + "disc.png"))
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(res_path + "add_to_list.png"), QtGui.QIcon.Normal,
-                       QtGui.QIcon.Off)
-        self.change_page_button.setIcon(icon)
-        self.change_page_button.setIconSize(QtCore.QSize(30, 30))
+        set_widget_icon(self.change_page_button, res_path + "add_to_list.png")
         self.change_page_button.setFlat(True)
 
     def set_main(self, main_w):
@@ -121,40 +117,21 @@ class my_window(QMainWindow, Ui_New_MainWindow):
         # 设置应用图标
         self.disc_3.setPixmap(QtGui.QPixmap(res_path + "disc.png"))
 
+        set_widget_icon(self.play_mode_button, res_path + "random.png")
+
+        set_widget_icon(self.previous_button, res_path + "on.png")
+
+        set_widget_icon(self.play_button, res_path + "start.png")
+
+        set_widget_icon(self.next_button, res_path + "de.png")
+
+        set_widget_icon(self.play_table_song_button, res_path + "open_folder.png")
+
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(res_path + "random.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.play_mode_button.setIcon(icon)
-        self.play_mode_button.setIconSize(QtCore.QSize(30, 30))
+        icon.addPixmap(QtGui.QPixmap(res_path + "disc1.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.setWindowIcon(icon)
 
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(res_path + "on.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.previous_button.setIcon(icon1)
-        self.previous_button.setIconSize(QtCore.QSize(30, 30))
-
-        icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(res_path + "start.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.play_button.setIcon(icon2)
-        self.play_button.setIconSize(QtCore.QSize(30, 30))
-
-        icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(res_path + "de.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.next_button.setIcon(icon3)
-        self.next_button.setIconSize(QtCore.QSize(30, 30))
-
-        icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap(res_path + "open_folder.png"), QtGui.QIcon.Normal,
-                        QtGui.QIcon.Off)
-        self.play_table_song_button.setIcon(icon4)
-        self.play_table_song_button.setIconSize(QtCore.QSize(30, 30))
-
-        icon5 = QtGui.QIcon()
-        icon5.addPixmap(QtGui.QPixmap(res_path + "disc1.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.setWindowIcon(icon5)
-
-        icon6 = QtGui.QIcon()
-        icon6.addPixmap(QtGui.QPixmap(res_path + "add_to_list.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.change_page_button.setIcon(icon6)
-        self.change_page_button.setIconSize(QtCore.QSize(30, 30))
+        set_widget_icon(self.change_page_button, res_path + "add_to_list.png")
         self.change_page_button.setFlat(True)
 
     def change_page(self):

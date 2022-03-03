@@ -9,7 +9,6 @@ import pygame
 import random
 import function
 from function import *
-from window import *
 
 if __name__ == "__main__":
     print("Welcome to use bilibiliPlayer")

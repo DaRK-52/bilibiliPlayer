@@ -5,10 +5,10 @@ from PyQt5.QtWidgets import QTableWidgetItem
 import function  # 防止from xxx import * 死锁
 
 # res_path = "C:/Users/19147/PycharmProjects/bilibiliPlayer/resources/images/"
-play_flag = 0
+play_flag = 0   # 用来解决播放按钮的切换问题
 
 
-def static_vars(**kwargs):
+def static_vars(**kwargs):  # 这个装饰器用来产生静态变量（虽然原理没太看懂
     def decorate(func):
         for k in kwargs:
             setattr(func, k, kwargs[k])
@@ -21,9 +21,9 @@ def gui_switch_song(window, string):
     global play_flag
     temp_cmd = ['play', string]
     function.start_flag = True
-    play_flag = 0 # 正在播放
+    play_flag = 0  # 正在播放
     function.play_song(temp_cmd)
-    window.song_title.setText(function.cur_song)
+    window.song_title.setText(function.cur_song[0: -4])
     swap_icon(play_flag, window)
 
 
@@ -38,14 +38,14 @@ def gui_play_song(window):
             function.pause()
         else:
             function.unpause()
-    window.song_title.setText(function.cur_song)
+    window.song_title.setText(function.cur_song[0: -4]) # 因为文件最后一定是.mp3,所以去掉4个字符
     swap_icon(play_flag, window)
 
 
 def gui_next(window):  # 传一个window用于设置标题
     global play_flag
     function.next_song()
-    window.song_title.setText(function.cur_song)
+    window.song_title.setText(function.cur_song[0: -4])
     play_flag = 0
     swap_icon(0, window)
 
@@ -53,7 +53,7 @@ def gui_next(window):  # 传一个window用于设置标题
 def gui_previous(window):
     global play_flag
     function.previous_song()
-    window.song_title.setText(function.cur_song)
+    window.song_title.setText(function.cur_song[0: -4])
     play_flag = 0
     swap_icon(0, window)
 
@@ -117,3 +117,11 @@ def gui_play_list(window):
         window.song_list_page.tableWidget.clear()
         window.song_list_page.tableWidget.setRowCount(0)
         window.song_list_page.hide()
+
+
+def set_widget_icon(widget, path):  # 给具体的控件设置icon
+    icon = QtGui.QIcon()
+    icon.addPixmap(QtGui.QPixmap(path), QtGui.QIcon.Normal,
+                   QtGui.QIcon.Off)
+    widget.setIcon(icon)
+    widget.setIconSize(QtCore.QSize(30, 30))
