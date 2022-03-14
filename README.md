@@ -3,11 +3,13 @@ bilibili音频播放器
 
 通过you-get下载b站的视频并转成mp3存储
 
-提供一个CLI的播放器
+提供一个CLI的播放器，也支持GUI界面
 
-python main.py即可
+首先安装requirements.txt下的库，接着在resources/settings.txt下修改环境配置，然后python main.py即可
 
 基本命令：
+
+**gui**     // 进入图形化界面
 
 add BVxxx yyy // 下载BV号为xxx的视频，存储为yyy.mp3
 

@@ -1,9 +1,11 @@
+import threading
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QTableWidgetItem
 from PyQt5.QtWidgets import QMainWindow
 
 import gui_function
-from main_window import *
+# from main_window import *
 from new_main_window import *
 from gui_function import *
 from search_window import *
@@ -39,7 +41,9 @@ class search_window(QMainWindow, Ui_SearchWindow):
     def add_song(self):
         av = self.tableWidget.selectedItems()[1].text()  # 获取av号或者bv号
         name = self.SearchEdit.text()  # 先不支持自定义文件名，直接拿搜索的字段命名
-        gui_add_song(av, name)
+        t = threading.Thread(target=gui_add_song, args=(av, name))
+        t.start()
+        # gui_add_song(av, name)
 
     def search(self, string):
         title_list, v_list = gui_search(string)
@@ -99,9 +103,12 @@ class my_window(QMainWindow, Ui_New_MainWindow):
         self.song_list_page = song_list_window()
         self.song_list_page.set_main(self)
 
+        self.setWindowTitle("BilibiliPlayer")
         self.configure_button()
         self.set_icon()
-        self.setGeometry(800, 600, 400, 180);
+        # 72貌似是进度条的最大值，但这是试出来的，我完全没搞懂这段怎么设置
+        self.time_line.setValue(72)
+        self.setGeometry(800, 600, 400, 180)
         self.setFixedSize(400, 180)
 
     def configure_button(self):  # 配置button

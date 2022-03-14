@@ -14,8 +14,9 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QMainWindow
 
 from str2byte import *
-from main_window import *
+# from main_window import *
 from my_window import *
+from mutagen.mp3 import MP3
 
 RANDOM = 0
 SEQUENCE = 1
@@ -36,6 +37,7 @@ cur_song_table = ''  # 记录当前播放的歌单名
 
 play_mode = RANDOM  # 默认随机播放
 song_list = []  # 待播放歌曲列表
+song_length = -1 # 歌曲播放时长
 history_song_list = []  # 历史记录，也可以用于寻找前一首歌
 song_num = 0  # 歌曲数量
 cur_song = -1  # 正在播放的歌曲， 防止随机播放播放出同一首歌
@@ -136,10 +138,11 @@ def check_song_not_exist(song):
 
 
 def pygame_play_song(path, file):
-    global cur_song, history_song_list
+    global cur_song, history_song_list, song_length
     if cur_song != -1:
         history_song_list.append(cur_song)
     cur_song = file
+    song_length = MP3(path + file).info.length  # 获取歌曲长度
     pygame.mixer.music.load(path + file)
     pygame.mixer.music.play()
 
@@ -187,17 +190,27 @@ def get_another_song():  # 防止在随机播放时连续播放同一首歌
 
 
 def listener():  # 监听歌曲是否结束，如果结束就切下一首歌
+    global song_length, gui_mode
     temp_cmd = ['play']
     pygame.mixer.init()
     while True:
         if (pygame.mixer.music.get_busy() or start_flag is False) and not close_flag:  # 还未开始或正在播放
             time.sleep(0.1)
+
+            # 更新进度条
+            if gui_mode and window != 1 and start_flag is True:
+                window.time_line.setValue(pygame.mixer.music.get_pos() / 1000 / song_length * 72)
         else:
+            # 这段写出线程不安全了我人麻了
+            time.sleep(0.1)
+            if pygame.mixer.music.get_busy():
+                break
+
             if close_flag:  # 判断程序是否结束
                 break
             next_song()
             if gui_mode:
-                window.song_title.setText(cur_song)
+                window.song_title.setText(cur_song[0:-4])
 
 
 def next_song():
