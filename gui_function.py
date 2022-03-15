@@ -3,9 +3,10 @@ from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import QTableWidgetItem
 
 import function  # 防止from xxx import * 死锁
+import pygame
 
 # res_path = "C:/Users/19147/PycharmProjects/bilibiliPlayer/resources/images/"
-play_flag = 0   # 用来解决播放按钮的切换问题
+play_flag = 0  # 用来解决播放按钮的切换问题
 
 
 def static_vars(**kwargs):  # 这个装饰器用来产生静态变量（虽然原理没太看懂
@@ -38,7 +39,7 @@ def gui_play_song(window):
             function.pause()
         else:
             function.unpause()
-    window.song_title.setText(function.cur_song[0: -4]) # 因为文件最后一定是.mp3,所以去掉4个字符
+    window.song_title.setText(function.cur_song[0: -4])  # 因为文件最后一定是.mp3,所以去掉4个字符
     swap_icon(play_flag, window)
 
 
@@ -125,3 +126,15 @@ def set_widget_icon(widget, path):  # 给具体的控件设置icon
                    QtGui.QIcon.Off)
     widget.setIcon(icon)
     widget.setIconSize(QtCore.QSize(30, 30))
+
+
+def time_line_value_changed(value):
+    pos = (value % 72) / 72 * function.song_length
+    if pos > 0:
+        pygame.mixer.music.set_pos(int(pos))
+        function.cur_pos = pos
+    function.lock = 0
+
+
+def get_lock():
+    function.lock = 1

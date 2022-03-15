@@ -107,7 +107,11 @@ class my_window(QMainWindow, Ui_New_MainWindow):
         self.configure_button()
         self.set_icon()
         # 72貌似是进度条的最大值，但这是试出来的，我完全没搞懂这段怎么设置
+        # 设置拖动进度条
         self.time_line.setValue(72)
+        self.time_line.sliderPressed.connect(get_lock)
+        self.time_line.sliderReleased.connect(lambda: time_line_value_changed(self.time_line.value()))
+
         self.setGeometry(800, 600, 400, 180)
         self.setFixedSize(400, 180)
 

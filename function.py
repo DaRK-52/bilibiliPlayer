@@ -38,6 +38,8 @@ cur_song_table = ''  # 记录当前播放的歌单名
 play_mode = RANDOM  # 默认随机播放
 song_list = []  # 待播放歌曲列表
 song_length = -1 # 歌曲播放时长
+cur_pos = 0 # 当前歌曲播放的位置，以秒为单位
+lock = 0 # 这个锁用来保证更新进度条的时候不会被抢占
 history_song_list = []  # 历史记录，也可以用于寻找前一首歌
 song_num = 0  # 歌曲数量
 cur_song = -1  # 正在播放的歌曲， 防止随机播放播放出同一首歌
@@ -138,11 +140,12 @@ def check_song_not_exist(song):
 
 
 def pygame_play_song(path, file):
-    global cur_song, history_song_list, song_length
+    global cur_song, history_song_list, song_length, cur_pos
     if cur_song != -1:
         history_song_list.append(cur_song)
     cur_song = file
     song_length = MP3(path + file).info.length  # 获取歌曲长度
+    cur_pos = 0
     pygame.mixer.music.load(path + file)
     pygame.mixer.music.play()
 
@@ -190,7 +193,7 @@ def get_another_song():  # 防止在随机播放时连续播放同一首歌
 
 
 def listener():  # 监听歌曲是否结束，如果结束就切下一首歌
-    global song_length, gui_mode
+    global song_length, gui_mode, cur_pos, lock
     temp_cmd = ['play']
     pygame.mixer.init()
     while True:
@@ -198,8 +201,10 @@ def listener():  # 监听歌曲是否结束，如果结束就切下一首歌
             time.sleep(0.1)
 
             # 更新进度条
-            if gui_mode and window != 1 and start_flag is True:
-                window.time_line.setValue(pygame.mixer.music.get_pos() / 1000 / song_length * 72)
+            if gui_mode and window != 1 and start_flag is True and lock == 0:
+                cur_pos = cur_pos + 0.1
+                window.time_line.setValue(cur_pos / song_length * 72)
+                window.time_pre.setText("" + str(int(cur_pos / 60)) + ":" + str(int(cur_pos) % 60))
         else:
             # 这段写出线程不安全了我人麻了
             time.sleep(0.1)
