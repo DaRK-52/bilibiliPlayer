@@ -1,3 +1,0 @@
-E:/bilibiliPlayer/audio/	#audio_path存放音频的地方
-E:/bilibiliPlayer/src_list/	#src_path 存放序列化文件和帮助文件的地方
-C:/Users/19147/PycharmProjects/bilibiliPlayer/resources/images/	#存放图片资源的地方

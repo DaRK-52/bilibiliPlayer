@@ -9,6 +9,7 @@ import threading
 import pickle
 import pygame
 import random
+import json
 
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QMainWindow
@@ -52,10 +53,14 @@ window = 1  # 存放窗口
 
 def set_env():  # 设置环境
     global audio_path, src_path, res_path
-    f = open("./resources/settings.txt", "r", encoding='utf-8')
-    audio_path = re.split(r'[\s]', f.readline().strip())[0]
-    src_path = re.split(r'[\s]', f.readline().strip())[0]
-    res_path = re.split(r'[\s]', f.readline().strip())[0]
+    f = open("./resources/settings.json", "r", encoding='utf-8')
+    config = json.loads(f.read())
+    # audio_path = re.split(r'[\s]', f.readline().strip())[0]
+    audio_path = config['audio_path']
+    # src_path = re.split(r'[\s]', f.readline().strip())[0]
+    src_path = config['src_path']
+    # res_path = re.split(r'[\s]', f.readline().strip())[0]
+    res_path = config['res_path']
     pass
 
 
