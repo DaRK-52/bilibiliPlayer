@@ -1,28 +1,23 @@
 # bilibiliPlayer
-bilibili音频播放器
 
-通过you-get下载b站的视频并转成mp3存储
+## 简介
+bilibiliPlayer是一款将b站上的视频转换为音频保存在本地并进行播放的音乐播放器。
 
-提供一个CLI的播放器，也支持GUI界面
+## 使用方式
+**安装相关依赖**
+> pip install -r requirements.txt
 
-首先安装requirements.txt下的库，接着在resources/settings.txt下修改环境配置，然后python main.py即可
+**clone项目到本地**
+> git clone https://github.com/DaRK-52/bilibiliPlayer.git
 
-基本命令：
+**修改配置文件**
 
-**gui**     // 进入图形化界面
+修改bilibiliPlayer/resources文件夹下的settings.json文件。
+- audio_path是您希望保存音频的位置
+- src_path是保存歌单信息的位置
+- res_path是图形化界面中图片资源的位置，通常就是bilibiliPlayer/resources/images的绝对路径
 
-add BVxxx yyy // 下载BV号为xxx的视频，存储为yyy.mp3
-
-play xxx  // 播放xxx.mp3
-
-next  //播放下一首
-
-pause
-
-unpause
-
-ps  // 显示当前播放歌曲
-
-chmod // 更改播放方式（循环，顺序，随机）
-
-search xxx // 在b站搜索xxx,会返回一个带视频标题和BV号的列表，选择序号下载想要的
+**运行程序**
+> cd bilibiliPlayer
+> python main.py
+如上即可运行程序，具体程序使用方式如下所示。
